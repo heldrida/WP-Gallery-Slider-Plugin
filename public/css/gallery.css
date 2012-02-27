@@ -25,4 +25,18 @@
 	text-decoration: underline;
 	color: black;
 }
-	
+.o-mv-up,
+.o-mv-down {
+	width:25px;
+	height:25px;
+	display:block;
+	text-indent:-9999px;
+	float:left;
+}
+.cpt-o-pos {
+	border:1px solid #BBB;
+	background: #EEE;
+	color:#888;
+	width:20px;
+	text-align:center;
+}
