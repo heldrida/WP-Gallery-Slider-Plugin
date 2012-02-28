@@ -164,7 +164,7 @@ if(! function_exists('gal_cpt_gallery_display_columns')){
 					/* 'ID' => __('Nrº'), */
 					'thumb' => __('Preview'),
 					'links_to' => __('Linking to Post'),
-					'post_author' => __('Author'),
+					/* 'post_author' => __('Author'), */
 					'options' => __('Options'),
 					'delete' => __('Delete')
 				);
