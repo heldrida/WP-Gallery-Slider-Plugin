@@ -32,9 +32,8 @@
 					
 				var post_id = $(el).attr('name').replace(/[^0-9]/ig, '' );
 				console.log( 'Post_id: ' + post_id );
-				$.get('', { 'action' : 're_order', 'post_id' : post_id, 'order_pos' : $(el).val() }, function(data) {
-					console.log('Success:');
-					console.log( data );
+				$.get('', { 'action' : 're_order', 'post_id' : post_id, 'menu_order' : $(el).val() }, function(data) {
+
 				});
 
 			};
@@ -45,7 +44,7 @@
 
 					var i = k + 1;
 					var curEl = $('.wp-list-table tbody tr').eq(k).find('.cpt-o-pos');
-
+					
 					curEl.val( i );
 					setOrderNr( curEl );
 

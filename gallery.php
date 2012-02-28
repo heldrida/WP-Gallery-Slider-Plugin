@@ -31,6 +31,8 @@ add_filter("manage_edit-cpt-gallery_columns", "gal_cpt_gallery_display_columns")
 add_action('do_meta_boxes', 'cpt_image_box');
 //add_action( 'admin_init', 'cpt_image_box', 1);
 
+add_filter('pre_get_posts', 'gal_cpt_order_posts');
+
 if(! function_exists('cpt_image_box') ){
 	function cpt_image_box() {
 		remove_meta_box( 'postimagediv', 'cpt-gallery', 'side' );
@@ -124,7 +126,7 @@ if(! function_exists('gal_constructor')){
 				),
 			'public' => true,
 			'has_archive' => true,
-			'supports' => array('title', 'thumbnail')
+			'supports' => array('title', 'thumbnail', 'page-attributes')
 			)
 		);		
 		register_taxonomy('Categories', array('cpt-gallery'), array('hierarchical' => true, 'label' => 'Categories', 'singular_label' => 'Category', 'rewrite' => true));	
@@ -197,7 +199,7 @@ if(! function_exists('gal_cpt_column_action')){
 				
 				case 'links_to':
 					
-					echo '<a href="'.(WEBSITE_URL.'?post_type=cpt-gallery&p='.$post->ID).'" title="" >'.($post->post_title).'</a>';
+					echo '<a href="'.(WEBSITE_URL.'?post_type=cpt-gallery&p='.$post->ID).'" title="" target="_blank" >'.($post->post_title).'</a>';
 				
 				break;
 				
@@ -221,7 +223,7 @@ if(! function_exists('gal_cpt_column_action')){
 				break;
 				
 				case 'order':
-					
+		
 					gal_order_handlers();
 
 				break;
@@ -262,8 +264,8 @@ if(! function_exists('gal_meta_fields_nodes')){
 		echo '<input id="post-title-type" type="text" name="post-title-type" value="'.(isset($meta['link-to-post-title']) ? $meta['link-to-post-title']  : null).'">';
 		echo '<input id="link-to-post-title" type="hidden" name="_cpt_meta_gallery[link-to-post-title]" value="">';
 		
-		echo '<p><strong>'.(__('Order')).':</strong></p>';
-		echo '<input type="text" value="'.(isset($meta['cpt-order']) ? $meta['cpt-order']  : null).'" name="cpt-order" />';
+		//echo '<p><strong>'.(__('Order')).':</strong></p>';
+		//echo '<input type="text" value="'.(isset($meta['cpt-order']) ? $meta['cpt-order']  : null).'" name="cpt-order" />';
 	};	
 };
 if(! function_exists('gal_meta_save')){
@@ -318,7 +320,10 @@ if(! function_exists('getSlideGalleryData')){
 
 		$args = array(
 			'post_type'       => 'cpt-gallery',
-			'post_status'     => 'publish'
+			'post_status'     => 'publish',
+			'orderby' => 'menu_order',
+			'order'	=> 'ASC',
+			'numberposts' => -1
 		); 
 		
 		$posts = get_posts( $args );
@@ -329,14 +334,14 @@ if(! function_exists('getSlideGalleryData')){
 			$image = wp_get_attachment_url( get_post_thumbnail_id( $k->ID ) );
 			
 			$arr[] = array(
-				'post_title' =>  $k->post_title,
+				'post_title' => $k->post_title,
 				'guid' => $k->guid,
 				'meta' => $meta,
 				'permalink' => $permalink,
 				'image' => $image
 			);
 		};
-		usort($arr, 'gal_cmp');
+		//usort($arr, 'gal_cmp');
 		
 		return ! empty( $arr ) && is_array($arr) ? $arr : FALSE;
 				
@@ -353,13 +358,16 @@ if(! function_exists('gal_order_handlers')){
 		echo '<a class="o-mv-up" href="'.(WEBSITE_ADMIN_URL.'edit.php?post_type=cpt-gallery&action=move_up&post_id='.$post->ID).'" title="Move up" style="background: url('.GAL_PLUGIN_URL.'public/images/arrow_up.png) no-repeat 0 0 transparent;">MoveUp</a>';
 		echo '<a class="o-mv-up" href="'.(WEBSITE_ADMIN_URL.'edit.php?post_type=cpt-gallery&action=move_down&post_id='.$post->ID).'" title="Move down" style="background: url('.GAL_PLUGIN_URL.'public/images/arrow_down.png) no-repeat 0 0 transparent;">MoveDown</a>';
 		*/
+		/*
 		echo '<input class="cpt-o-pos" type="" name="item_order_'.($post->ID).'" value="'.($meta['cpt-order']).'" readonly="readonly">';
-
+		*/
+		echo '<input class="cpt-o-pos" type="" name="item_order_'.($post->ID).'" value="'.($post->menu_order).'" readonly="readonly">';		
 	};
 };
 if(! function_exists('gal_re_order_slide')){
 	function gal_re_order_slide(){
 
+		/*
 		$meta = get_post_meta( $_GET['post_id'], '_cpt_meta_gallery', TRUE );
 
 		$data = array(
@@ -369,8 +377,43 @@ if(! function_exists('gal_re_order_slide')){
 		);
 		
 		update_post_meta($_GET['post_id'],'_cpt_meta_gallery', $data );		
-		
+		*/
+
+		wp_update_post( array( 'ID' => $_GET['post_id'], 'menu_order' => $_GET['menu_order'] ) );
+
 		exit;
 
+	};
+};
+/*
+if(! function_exists('gal_cpt_order_posts')){
+	function gal_cpt_order_posts($orderBy){
+		global $wpdb;
+		if( is_admin() ){
+
+            $orderBy = "{$wpdb->posts}.menu_order, {$wpdb->posts}.post_date DESC";
+
+            return $orderBy;
+		};
+			
+	};
+};
+*/
+//http://www.dansmart.co.uk/2011/09/how-to-order-your-custom-post-type-edit-screen-by-menu-order/
+add_action( 'pre_get_posts', 'gal_cpt_order_posts' );
+if(! function_exists('gal_cpt_order_posts')){
+	function gal_cpt_order_posts( $query ){
+	
+	  if($query->is_admin) {
+	 
+	        if ($query->get('post_type') == 'cpt-gallery')
+	        {
+	          $query->set('orderby', 'menu_order');
+	          $query->set('order', 'ASC');
+	        }
+	  }
+	  return $query;
+
+		
 	};
 };
