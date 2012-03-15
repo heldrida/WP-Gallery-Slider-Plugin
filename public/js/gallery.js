@@ -39,7 +39,6 @@
 			};
 
 			var reOrderItems = function(){
-				console.log( $('.wp-list-table tr') );
 				$('.wp-list-table tbody tr').each(function(k,v){
 
 					var i = k + 1;
