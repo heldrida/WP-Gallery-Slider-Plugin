@@ -40,3 +40,11 @@
 	width:20px;
 	text-align:center;
 }
+tr.cpt-gallery { cursor:move; }
+.tr-btn-gal {
+	margin-top: 5px;
+	float: left;
+}
+tr.cpt-gallery:hover {
+	background:#F2F2F2;
+}

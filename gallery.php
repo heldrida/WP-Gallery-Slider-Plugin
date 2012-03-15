@@ -163,9 +163,9 @@ if(! function_exists('gal_cpt_gallery_display_columns')){
 					'order' => __('Order'),
 					/* 'ID' => __('Nrº'), */
 					'thumb' => __('Preview'),
-					'links_to' => __('Linking to Post'),
-					/* 'post_author' => __('Author'), */
 					'options' => __('Options'),
+					'links_to' => __('Link to Post'),
+					/* 'post_author' => __('Author'), */				
 					'delete' => __('Delete')
 				);
 	
@@ -192,7 +192,9 @@ if(! function_exists('gal_cpt_column_action')){
 				break;
 				
 				case 'thumb':
+					echo '<a href="'.(WEBSITE_ADMIN_URL.'post.php?post='.$post->ID.'&action=edit').'" >';
 					the_post_thumbnail('thumbnail');
+					echo '</a>';
 					//echo '<img src="http://angelleadesigns.com/wp-content/uploads/2011/09/lion-thumbnail.jpg" alt="" style="width:50px; height:50px;" />';
 					
 				break;
@@ -205,7 +207,7 @@ if(! function_exists('gal_cpt_column_action')){
 				
 				case 'options':
 				
-					echo '<a href="'.(WEBSITE_ADMIN_URL.'post.php?post='.$post->ID.'&action=edit').'" >'.( __('Edit') ).'</a>';
+					echo '<a class="button-secondary tr-btn-gal" href="'.(WEBSITE_ADMIN_URL.'post.php?post='.$post->ID.'&action=edit').'" >'.( __('Edit') ).'</a>';
 				
 				break;
 				
@@ -218,7 +220,7 @@ if(! function_exists('gal_cpt_column_action')){
 				case 'delete':
 					
 					//http://localhost/wordpress/wp-admin/post.php?post=633&action=trash&_wpnonce=095c4c60e2
-					echo '<a href="'.( WEBSITE_ADMIN_URL.'post.php?post='.$post->ID.'&action=delete_gallery_item' ).'">'.( __('Delete') ).'</a>';
+					echo '<a class="button-secondary tr-btn-gal" href="'.( WEBSITE_ADMIN_URL.'post.php?post='.$post->ID.'&action=delete_gallery_item' ).'">'.( __('Delete') ).'</a>';
 					
 				break;
 				
